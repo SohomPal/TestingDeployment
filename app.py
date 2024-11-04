@@ -35,7 +35,18 @@ def get_ips():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# Endpoint 2: To be implemented later
+
+@app.route('/clearLogs', methods=['POST'])
+def clear_logs():
+    try:
+        # Clear the log file
+        open(LOG_FILE_PATH, 'w').close()
+        # Alternatively, you can truncate the file using shell command
+        # subprocess.run(['truncate', '-s', '0', LOG_FILE_PATH], check=True)
+        return jsonify({'message': 'Apache logs have been cleared'}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+        
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
