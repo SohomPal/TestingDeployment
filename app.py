@@ -41,8 +41,6 @@ def clear_logs():
     try:
         # Clear the log file
         open(LOG_FILE_PATH, 'w').close()
-        # Alternatively, you can truncate the file using shell command
-        # subprocess.run(['truncate', '-s', '0', LOG_FILE_PATH], check=True)
         return jsonify({'message': 'Apache logs have been cleared'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
