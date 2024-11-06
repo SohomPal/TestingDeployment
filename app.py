@@ -1,13 +1,37 @@
+import collections
 from flask import Flask, request, jsonify
+from datetime import datetime
 import subprocess
 
 app = Flask(__name__)
 
 # Define the path to your Apache access log file
-LOG_FILE_PATH = '/var/log/apache2/access.log'  # Adjust this path if necessary
+LOG_FILE_PATH = '/var/log/apache2/access.log'
+
+tokenMap = collections.defaultdict(set)
+
+@app.route('/')
+def recordIP():
+    timestamp = datetime.utcnow().isoformat()
+    token = request.args.get('token')
+    if token:
+        # Extract client's IP address
+        ip_address = request.remote_addr
+        # Log the token and IP address
+        tokenMap[token].add({"IP_ADDRESS": ip_address, "TIMESTAMP": timestamp})
 
 @app.route('/getIPs', methods=['GET'])
 def get_ips():
+    token = request.args.get('token')
+    if not token:
+        return jsonify({'error': 'Token parameter is required'}), 400
+    ip_list = [entry["IP_ADDRESS"] for entry in tokenMap[token]]
+    return jsonify({'ip_addresses': ip_list})
+
+
+# @app.route('/getIPs', methods=['GET'])
+# Currently not using this method
+def get_ips_deprecated():
     token = request.args.get('token')
     if not token:
         return jsonify({'error': 'Token parameter is required'}), 400
@@ -35,16 +59,17 @@ def get_ips():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-
-@app.route('/clearLogs', methods=['POST'])
+# @app.route('/clearLogs', methods=['POST'])
+# Currently not using this method
 def clear_logs():
     try:
         # Clear the log file
         open(LOG_FILE_PATH, 'w').close()
+        # Alternatively, you can truncate the file using shell command
+        # subprocess.run(['truncate', '-s', '0', LOG_FILE_PATH], check=True)
         return jsonify({'message': 'Apache logs have been cleared'}), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-        
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
