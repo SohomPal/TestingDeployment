@@ -12,20 +12,25 @@ tokenMap = collections.defaultdict(set)
 
 @app.route('/')
 def recordIP():
-    timestamp = datetime.utcnow().isoformat()
+    #timestamp = datetime.utcnow().isoformat()
     token = request.args.get('token')
     if token:
         # Extract client's IP address
         ip_address = request.remote_addr
         # Log the token and IP address
-        tokenMap[token].add({"IP_ADDRESS": ip_address, "TIMESTAMP": timestamp})
+        tokenMap[token].add(ip_address)
+        #tokenMap[token].add({"IP_ADDRESS": ip_address, "TIMESTAMP": timestamp})
+        return jsonify({'message': 'Recorded'}), 200
+    else:
+        return jsonify({'error': "No token defined"}), 500
 
 @app.route('/getIPs', methods=['GET'])
 def get_ips():
     token = request.args.get('token')
     if not token:
         return jsonify({'error': 'Token parameter is required'}), 400
-    ip_list = [entry["IP_ADDRESS"] for entry in tokenMap[token]]
+    #ip_list = [entry["IP_ADDRESS"] for entry in tokenMap[token]]
+    ip_list = list(tokenMap[token])
     return jsonify({'ip_addresses': ip_list})
 
 
