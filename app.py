@@ -17,11 +17,7 @@ def recordIP():
     if not token:
         return jsonify({'error': 'Token parameter is required'}), 400
 
-    # Extract client's IP address
-    if request.headers.getlist("X-Forwarded-For"):
-        ip_address = request.headers.getlist("X-Forwarded-For")[0]
-    else:
-        ip_address = request.remote_addr
+    ip_address = request.remote_addr
 
     # Log the token, IP address, and timestamp
     tokenMap[token].add({"IP_ADDRESS": ip_address, "TIMESTAMP": timestamp})
@@ -83,4 +79,4 @@ def clear_logs():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=80, debug=True)
