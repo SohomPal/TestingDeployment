@@ -10,27 +10,33 @@ LOG_FILE_PATH = '/var/log/apache2/access.log'
 
 tokenMap = collections.defaultdict(set)
 
-@app.route('/')
+@app.route('/', methods=['GET'])
 def recordIP():
-    #timestamp = datetime.utcnow().isoformat()
+    timestamp = datetime.utcnow().isoformat()
     token = request.args.get('token')
-    if token:
-        # Extract client's IP address
-        ip_address = request.remote_addr
-        # Log the token and IP address
-        tokenMap[token].add(ip_address)
-        #tokenMap[token].add({"IP_ADDRESS": ip_address, "TIMESTAMP": timestamp})
-        return jsonify({'message': 'Recorded'}), 200
+    if not token:
+        return jsonify({'error': 'Token parameter is required'}), 400
+
+    # Extract client's IP address
+    if request.headers.getlist("X-Forwarded-For"):
+        ip_address = request.headers.getlist("X-Forwarded-For")[0]
     else:
-        return jsonify({'error': "No token defined"}), 500
+        ip_address = request.remote_addr
+
+    # Log the token, IP address, and timestamp
+    tokenMap[token].add({"IP_ADDRESS": ip_address, "TIMESTAMP": timestamp})
+
+    # Optionally, return a response
+    return jsonify({'message': 'Token and IP logged successfully'}), 200
+
 
 @app.route('/getIPs', methods=['GET'])
 def get_ips():
     token = request.args.get('token')
     if not token:
         return jsonify({'error': 'Token parameter is required'}), 400
-    #ip_list = [entry["IP_ADDRESS"] for entry in tokenMap[token]]
-    ip_list = list(tokenMap[token])
+    ip_list = [entry["IP_ADDRESS"] for entry in tokenMap[token]]
+    #ip_list = list(tokenMap[token])
     return jsonify({'ip_addresses': ip_list})
 
 
