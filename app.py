@@ -10,21 +10,23 @@ tokenMap = collections.defaultdict(set)
 @app.route('/dcv', methods=['POST'])
 def recordIP():
     timestamp = datetime.utcnow().isoformat()
+    print("request received")
 
     # Retrieve JSON data from the request body
     data = request.get_json()
+    print("data received")
     if not data:
         return jsonify({'error': 'Request body must contain JSON data'}), 400
 
     token = data.get('token')
-
+    print("token received")
     if not token:
         return jsonify({'error': 'Token parameter is required'}), 400
     # if not data_center:
     #     return jsonify({'error': 'Data-center parameter is required'}), 400
 
     ip_address = request.remote_addr
-
+    print("IP received")
     # Create an entry with the required structure
     entry = {
         "IP_ADDRESS": ip_address,
@@ -34,6 +36,7 @@ def recordIP():
 
     # Add the entry to the tokenMap
     tokenMap[token].append(entry)
+    print("logging received")
 
     # Optionally, return a response
     return jsonify({'message': 'Token, IP, and data center logged successfully'}), 200
