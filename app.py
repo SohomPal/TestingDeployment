@@ -35,7 +35,7 @@ def recordIP():
     }
 
     # Add the entry to the tokenMap
-    tokenMap[token].append(entry)
+    tokenMap[token].add(entry)
     print("logging received")
 
     # Optionally, return a response
