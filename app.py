@@ -17,12 +17,11 @@ def recordIP():
         return jsonify({'error': 'Request body must contain JSON data'}), 400
 
     token = data.get('token')
-    data_center = data.get('data-center')
 
     if not token:
         return jsonify({'error': 'Token parameter is required'}), 400
-    if not data_center:
-        return jsonify({'error': 'Data-center parameter is required'}), 400
+    # if not data_center:
+    #     return jsonify({'error': 'Data-center parameter is required'}), 400
 
     ip_address = request.remote_addr
 
@@ -30,7 +29,7 @@ def recordIP():
     entry = {
         "IP_ADDRESS": ip_address,
         "TIMESTAMP": timestamp,
-        "DATA_CENTER": data_center
+        # "DATA_CENTER": data_center
     }
 
     # Add the entry to the tokenMap
@@ -93,5 +92,5 @@ def get_ips():
 #         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=80, debug=True)
     # app.run(host='0.0.0.0', port=5000, debug=True)
